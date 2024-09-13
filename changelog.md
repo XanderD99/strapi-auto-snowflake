@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.6] - 2024-09-13
+## [0.0.2] - 2024-09-13
+
+### Added
+
+- config validation, epoch can't be in the future
+
+### Fixed
+
+- fix incorrect calculation causing negative values
+
+## [0.0.1] - 2024-09-13
 
 ### Added
 
