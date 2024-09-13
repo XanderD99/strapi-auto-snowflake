@@ -1,6 +1,6 @@
 {
   "name": "strapi-auto-snowflake",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "This is the description of the plugin.",
   "strapi": {
     "name": "field-snowflake",
@@ -27,7 +27,7 @@
     "rimraf": "^3.0.2"
   },
   "peerDependencies": {
-    "@strapi/strapi": "^4.9.2",
+    "@strapi/strapi": "4.25.10",
     "react": "^17.0.0 || ^18.0.0",
     "react-dom": "^17.0.0 || ^18.0.0",
     "react-router-dom": "^5.2.0",
