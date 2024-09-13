@@ -15,3 +15,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - auto register database hooks for snowflake fields
 - custom epoch time
 - snowflake service for generation and validation
+- custom plugin icon
