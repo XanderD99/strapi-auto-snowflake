@@ -16,8 +16,14 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
-      - run: npm ci --include=dev
-      - run: npm run build
-      - run: npm publish --access public
+          cache: npm
+      - name: "Install dependencies"
+        run: npm install
+      - name: "Build release"
+        run: npm run build
+      - name: "Copy README.md"
+        run: cp README.md dist/README.md
+      - name: "Publish to NPM"
+        run: cd dist && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
