@@ -1,9 +1,9 @@
 {
-  "name": "strapi-plugin-auto-snowflake",
-  "version": "0.0.2",
+  "name": "strapi-plugin-snowflake",
+  "version": "0.0.1",
   "description": "This is the description of the plugin.",
   "strapi": {
-    "name": "auto-snowflake",
+    "name": "snowflake",
     "description": "Description of strapi-auto-snowflake plugin",
     "kind": "plugin"
   },
