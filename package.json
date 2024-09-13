@@ -33,20 +33,32 @@
     "styled-components": "^5.2.1"
   },
   "author": {
-    "name": "XanderD99"
+    "name": "XanderD",
+    "url": "https://github.com/XanderD99"
   },
   "maintainers": [
     {
-      "name": "XanderD99"
+      "name": "XanderD",
+      "url": "https://github.com/XanderD99"
     }
   ],
+  "homepage": "https://github.com/XanderD99/strapi-auto-snowflake",
+  "readme": "https://github.com/XanderD99/strapi-auto-snowflake#readme",
+  "repository": {
+    "url": "https://github.com/XanderD99/strapi-auto-snowflake",
+    "type": "git",
+    "directory": "."
+  },
   "engines": {
     "node": ">=18.0.0 <=20.x.x",
     "npm": ">=6.0.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "develop": "tsc -w",
-    "build": "rimraf dist && tsc"
+    "develop": "tsc -p tsconfig.server.json -w",
+    "build": "tsc -p tsconfig.server.json"
   },
   "license": "MIT"
 }

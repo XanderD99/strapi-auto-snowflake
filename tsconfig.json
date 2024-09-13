@@ -1,27 +1,19 @@
 {
-  "extends": "@strapi/typescript-utils/tsconfigs/server",
+  "extends": "@strapi/typescript-utils/tsconfigs/admin",
+
   "compilerOptions": {
-    "lib": [
-      "ESNext",
-      "dom"
-    ],
-    "outDir": "dist",
-    "rootDir": ".",
-    "jsx": "react-jsx",
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "strictNullChecks": true
+    "target": "ESNext",
+    "strict": true
   },
-  "include": [
-    // Include the root directory
-    "./",
-    // Force the JSON files in the src folder to be included
-    "package.json",
-    "admin/**/*.json"
-  ],
+
+  "include": ["admin", "custom.d.ts"],
+
   "exclude": [
     "node_modules/",
     "dist/",
+
+    // Do not include server files in the server compilation
+    "server/",
     // Do not include test files
     "**/*.test.ts"
   ]
