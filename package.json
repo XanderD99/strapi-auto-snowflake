@@ -45,8 +45,7 @@
   },
   "scripts": {
     "develop": "tsc -p tsconfig.server.json -w",
-    "build": "tsc -p tsconfig.server.json",
-    "prepublish": "npm run build"
+    "build": "tsc -p tsconfig.server.json"
   },
   "license": "MIT"
 }
