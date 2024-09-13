@@ -20,7 +20,6 @@ import {
   Stack,
   Flex,
 } from '@strapi/design-system';
-import snowflake, { validate } from '../../../../snowflake';
 
 export const FieldActionWrapper = styled(FieldAction)`
   svg {
@@ -61,22 +60,7 @@ const Input = ({
   value: string
 }) => {
   const { formatMessage } = useIntl()
-  const [invalidSnowflake, setInvalidUUID] = useState<boolean>(false)
   const ref = useRef("")
-
-  // useEffect(() => {
-  //   if(!initialValue) {
-  //     const newUUID = snowflake()
-  //     onChange({ target: { value: newUUID, name }})
-  //   }
-
-  //   if(initialValue && initialValue !== ref.current)
-  //     ref.current = initialValue
-
-  //   const validateValue = validate(initialValue)
-  //   if(!validateValue) return setInvalidUUID(true)
-  //   setInvalidUUID(false)
-  // }, [initialValue])
 
   return (
     <Box>
@@ -84,15 +68,7 @@ const Input = ({
         id={name}
         name={name}
         hint={description && formatMessage(description)}
-        error={error ?? (
-          invalidSnowflake
-            ? formatMessage({
-                id: 'snowflake.form.field.error',
-                defaultMessage: 'The snowflake format is invalid.',
-              })
-            : null
-          )
-        }
+        error={error}
       >
         <Stack spacing={1}>
           <Flex>

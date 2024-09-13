@@ -23,7 +23,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^5.3.4",
     "styled-components": "^5.3.6",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "rimraf": "^3.0.2"
   },
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0",
@@ -32,11 +33,11 @@
     "styled-components": "^5.2.1"
   },
   "author": {
-    "name": "A Strapi developer"
+    "name": "XanderD99"
   },
   "maintainers": [
     {
-      "name": "A Strapi developer"
+      "name": "XanderD99"
     }
   ],
   "engines": {
@@ -44,8 +45,8 @@
     "npm": ">=6.0.0"
   },
   "scripts": {
-    "develop": "tsc -p tsconfig.server.json -w",
-    "build": "tsc -p tsconfig.server.json"
+    "develop": "tsc -w",
+    "build": "rimraf dist && tsc"
   },
   "license": "MIT"
 }
