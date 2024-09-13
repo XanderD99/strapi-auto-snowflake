@@ -24,7 +24,6 @@ export default ({ strapi }: { strapi: Strapi }) => {
 
   const modelsToSubscribe = Object.keys(models)
 
-
   const { service } = strapi.plugin(pluginId);
   const { generate, validate } = service('snowflake')
   strapi.db!.lifecycles.subscribe((event) => {

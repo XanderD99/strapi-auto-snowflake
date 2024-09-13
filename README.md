@@ -15,16 +15,16 @@ This Strapi plugin provides a custom field to handle Discord-style snowflakes. I
 ## ⌛ Installation
 
 ```bash
-npm i strapi-auto-snowflake
+npm i strapi-plugin-auto-snowflake
 # or
-yarn add strapi-auto-snowflake
+yarn add strapi-plugin-auto-snowflake
 ```
 
 ### ⚙️ Configuration
 
 ```ts
 export default {
-  'strapi-auto-snowflake': {
+  'auto-snowflake': {
     enabled: true,
     config: {
       epoch: new Date(0)
