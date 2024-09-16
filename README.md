@@ -1,9 +1,9 @@
 # Strapi Snowflake Plugin
 
-This Strapi plugin provides a custom field to handle Discord-style snowflakes. It automatically generates new snowflakes for entries if not present and validates snowflakes provided in the request body. Additionally, you can configure a custom epoch timestamp for generating snowflakes, with the default set to `Date(0)` (January 1, 1970).
+This plugin provides automatic generation and validation of Snowflake IDs in Strapi, based on a custom epoch. It includes a custom field where Snowflake IDs can be viewed but not modified, and it automatically generates a Snowflake if none is present during creation.
 
-> [!CAUTION]
-> If you set a custom epoch timestamp, for example Janaury 1, 2024. Snowflakes from Discord will throw errors. Since discord snowflakes are generated from an epoch January 1, 2015. This will then throw validation errors since some discord snowflakes will have a timestamp that is before your custom set epoch date.
+> [!IMPORTANT]
+> If you want to integrate other services their snowflakes you can. It won't error, BUT do mind that the parse function could return incorrect information then.
 
 ## ✨ Features
 
@@ -24,10 +24,12 @@ yarn add strapi-plugin-auto-snowflake
 
 ```ts
 export default {
-  'auto-snowflake': {
+  snowflake: {
     enabled: true,
     config: {
-      epoch: new Date(0)
+      epoch: new Date(0),
+      // Make sure worker is unique for every instance you run of your api. If not duplicate ids may be created
+      worker: 0,
     }
   }
 }
@@ -49,6 +51,7 @@ import { factories } from '@strapi/strapi'
 export default factories.createCoreController('api::navigation.navigation', {
   findOne(ctx) {
     // ... your code
+    
     const { service } = strapi.plugin('strapi-auto-snowflake');
 
     const { generate, validate } = service('snowflake')
@@ -66,10 +69,16 @@ export default factories.createCoreController('api::navigation.navigation', {
 
 A snowflake is a 64-bit identifier used to uniquely represent a resource. It consists of several parts, each occupying a specific number of bits:
 
-| field     | bits  | number of bits | description                  |   |
-|-----------|-------|----------------|------------------------------|---|
-| timestamp | 63-22 | 42             | Milliseconds since set Epoch |   |
-| random    | 21-0  | 22             |                              |   |
+| Field      | Bits      | Number of Bits | Description                                                             | Retrieval                            |
+|------------|-----------|----------------|-------------------------------------------------------------------------|--------------------------------------|
+| Timestamp  | 63 to 22  | 42 bits         | Milliseconds since custom epoch.                                        | (snowflake >> 22) + epoch            |
+| Worker ID  | 21 to 12  | 10 bits         | Represents the worker or machine ID where the snowflake was generated.  | (snowflake >> 12) & 0x3FF            |
+| Sequence   | 11 to 0   | 12 bits         | Per-machine sequence number to allow multiple IDs within the same millisecond. | snowflake & 0xFFF                    |
+
+The final Snowflake is represented as a decimal number. The timestamp represents the milliseconds since the configured epoch. The worker ID and sequence prevent clashes across multiple processes or machines.
+
+> [!IMPORTANT]  
+> Make sure worker is unique for every instance you run of your api. If not duplicate ids may be created. By default the worker is created by the process id `process.pid % 1024`
 
 ## 🙏 Contributing
 

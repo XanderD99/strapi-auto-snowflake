@@ -25,13 +25,11 @@ export default ({ strapi }: { strapi: Strapi }) => {
   const modelsToSubscribe = Object.keys(models)
 
   const { service } = strapi.plugin(pluginId);
-  const { generate, validate } = service('snowflake')
+  const { generate } = service('snowflake');
+
   strapi.db!.lifecycles.subscribe((event) => {
     if (event.action === 'beforeCreate' && modelsToSubscribe.includes(event.model.uid)) {
       models[event.model.uid].forEach((attribute) => {
-        if (event.params.data[attribute] && !validate(event.params.data[attribute])) {
-          throw new errors.ValidationError('Invalid snowflake')
-        }
         if(!event.params.data[attribute]) event.params.data[attribute] = generate()
       })
     }

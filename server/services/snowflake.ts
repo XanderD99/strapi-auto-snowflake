@@ -4,80 +4,97 @@
 
 import { Strapi } from "@strapi/strapi";
 import pluginId from "../../utils/pluginId";
+import { DEFAULTS } from "..";
 
-const SNOWFLAKE_TIMESTAMP_SHIFT = BigInt(22);
+const one = BigInt(1)
+
+export const waitUntilNextTimestamp = (currentTimestamp: number) => {
+  let nextTimestamp = Date.now();
+  while (nextTimestamp <= currentTimestamp) {
+    nextTimestamp = Date.now();
+  }
+  return nextTimestamp;
+};
 
 export default ({ strapi }: { strapi: Strapi }) => {
+  let lastTimestamp = -1;
+  let sequence = 0;
+  const maxSequence = (1 << DEFAULTS.SEQUENCE_BITS) - 1;
+
   const { config } = strapi.plugin(pluginId);
 
-  const epoch: Date = config('epoch');
-  const epochBigInt = BigInt(epoch.getTime());
+  const epoch: number = (config('epoch') as Date).getTime();
+  const worker: number = config('worker')
 
   return {
-    generate: (ts = new Date()) => {
-      const timestamp = BigInt(ts.getTime());
+    generate: () => {
+      // Get the current timestamp in milliseconds
+      let timestamp = Date.now();
 
-      // Calculate the time difference between now and the Discord Epoch
-      const timestampPart = (timestamp - epochBigInt) << SNOWFLAKE_TIMESTAMP_SHIFT;
+      // If the current timestamp is less than the last timestamp, it means the clock is moving backward
+      if (timestamp < lastTimestamp) throw new Error('Clock is moving backwards!');
 
-      // Generate a random number with SNOWFLAKE_TIMESTAMP_SHIFT bits
-      const randomPart = BigInt(Math.floor(Math.random() * (2 ** Number(SNOWFLAKE_TIMESTAMP_SHIFT))));
+      // If the timestamp is the same as the last one (still within the same millisecond)
+      if (timestamp === lastTimestamp) {
+        // Increment the sequence number and apply a bitwise AND with maxSequence to ensure it wraps around
+        sequence = (sequence + 1) & maxSequence;
 
-      // Combine the timestamp part and the random part to form the snowflake
-      const snowflake = timestampPart | randomPart;
+        // If sequence exceeds its limit (i.e., we reached the max value), we wait until the next millisecond
+        if (sequence === 0) timestamp = waitUntilNextTimestamp(timestamp);
+      } else {
+        // If the timestamp has changed, reset the sequence number to 0
+        sequence = 0;
+      }
 
-      return snowflake.toString();  // Return as a string to avoid precision issues
+      // Update the last timestamp to the current one
+      lastTimestamp = timestamp;
+
+      // Calculate the offset between the current timestamp and the epoch (the reference starting point)
+      const timestampOffset = timestamp - epoch;
+
+      // Convert the timestamp offset to a binary string and pad it to the required length (SNOWFLAKE_TIMESTAMP_SHIFT)
+      const timestampBits = timestampOffset.toString(2).padStart(DEFAULTS.TIMESTAMP_BITS, '0');
+
+      // Convert the worker ID to a binary string and pad it to the required length (WORKER_ID_BITS)
+      const workerIdBits = worker.toString(2).padStart(DEFAULTS.WORKER_ID_BITS, '0');
+
+      // Convert the sequence number to a binary string and pad it to the required length (SEQUENCE_BITS)
+      const sequenceBits = sequence.toString(2).padStart(DEFAULTS.SEQUENCE_BITS, '0');
+
+      // Concatenate the timestamp, worker ID, and sequence bits to form the binary representation of the snowflake ID
+      const idBinary = `${timestampBits}${workerIdBits}${sequenceBits}`;
+
+      // Convert the binary string to a decimal string (BigInt handles large numbers safely)
+      const idDecimal = BigInt('0b' + idBinary).toString();
+
+      // Return the snowflake ID as a string (to avoid issues with large numbers in JavaScript)
+      return idDecimal.toString();
     },
-    validate: (snowflake: string | number) => {
-      // Ensure the snowflake is a string or number
-      if (typeof snowflake !== 'string' && typeof snowflake !== 'number') return false;
-
-      // Ensure the snowflake is a BigInt (for 64-bit precision)
+    parse: (snowflake: string | number) => {
       const snowflakeBigInt = BigInt(snowflake);
 
-      // Ensure the snowflake is a valid 64-bit number (positive)
-      if (snowflakeBigInt < 0) {
-        return false;
-      }
+      // Constants for bit-shifting
+      const workerIdShift = BigInt(DEFAULTS.SEQUENCE_BITS); // Worker ID is shifted by sequence bits
+      const timestampShift = BigInt(DEFAULTS.WORKER_ID_BITS + DEFAULTS.SEQUENCE_BITS); // Timestamp is shifted by worker + sequence bits
 
-      // Calculate mask for random part using the bit offset
-      const one = BigInt(1)
-      const randomMask = (one << SNOWFLAKE_TIMESTAMP_SHIFT) - one;
+      // Bitmask for worker ID and sequence parts
+      const workerIdMask = (one << BigInt(DEFAULTS.WORKER_ID_BITS)) - one;
+      const sequenceMask = (one << BigInt(DEFAULTS.SEQUENCE_BITS)) - one;
 
-      // Extract timestamp part (first bits up to SNOWFLAKE_TIMESTAMP_SHIFT)
-      const timestampPart = snowflakeBigInt >> SNOWFLAKE_TIMESTAMP_SHIFT;
+      // Extract the individual parts
+      const timestampOffset = Number(snowflakeBigInt >> timestampShift); // Extract timestamp part
+      const workerId = Number((snowflakeBigInt >> workerIdShift) & workerIdMask); // Extract worker ID
+      const sequence = Number(snowflakeBigInt & sequenceMask); // Extract sequence number
 
-      // Extract the random part (last SNOWFLAKE_TIMESTAMP_SHIFT bits)
-      const randomPart = snowflakeBigInt & randomMask;
+      // Add back the epoch to get the actual timestamp
+      const timestamp = timestampOffset + epoch;
 
-      // Calculate the actual timestamp from the snowflake
-      const timestamp = timestampPart + epochBigInt;
-
-      // Convert timestamp to a Date object
-      const creationDate = new Date(Number(timestamp));
-
-      // Get current date for validation
-      const now = new Date();
-
-      // Check if the date is in the future or too far in the past
-      if (creationDate > now || creationDate < epoch) {
-        return false;
-      }
-
-      // Ensure randomPart fits within the SNOWFLAKE_TIMESTAMP_SHIFT range
-      if (randomPart < 0 || randomPart > randomMask) {
-        return false;
-      }
-      return true;
+      // Return an object with the parts
+      return {
+        timestamp: new Date(timestamp), // Convert to Date object for readability
+        workerId,
+        sequence,
+      };
     }
   }
 };
-
-
-// export default (strapi: Strapi) => {
-//   const { config } = strapi.plugin(pluginId)
-
-//   return {
-//     generate:  (ts = Date.now(), randomBits?: number, epoch = SNOWFLAKE_EPOCH) => `${(BigInt(ts - epoch) << SNOWFLAKE_TIMESTAMP_SHIFT) + BigInt(randomBits || Math.round(Math.random() * UNSIGNED_23BIT_MAX))}`
-//   };
-// }
