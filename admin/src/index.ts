@@ -8,13 +8,13 @@ export default {
     app.customFields.register({
       name: 'snowflake',
       pluginId: PLUGIN_ID,
-      type: "string",
+      type: "uid",
       intlLabel: {
-        id: getTranslation("form.label"),
+        id: getTranslation("label"),
         defaultMessage: "snowflake",
       },
       intlDescription: {
-        id: getTranslation("form.description"),
+        id: getTranslation("description"),
         defaultMessage: "Generates a unique snowflake",
       },
       icon: PluginIcon,

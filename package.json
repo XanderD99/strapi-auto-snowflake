@@ -2,7 +2,7 @@
   "name": "strapi-plugin-snowflake",
   "version": "2.0.0",
   "description": "",
-  "keywords": ["strapi"],
+  "keywords": ["strapi", "snowflake"],
   "license": "MIT",
   "author": {
       "name": "XanderD",
@@ -78,7 +78,7 @@
   },
   "strapi": {
     "name": "snowflake",
-    "description": "Description of strapi-auto-snowflake plugin",
+    "description": "A plugin that allows users to use snowflake IDs",
     "kind": "plugin"
   }
 }
