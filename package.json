@@ -1,43 +1,14 @@
 {
   "name": "strapi-plugin-snowflake",
-  "version": "1.0.0",
-  "description": "This is the description of the plugin.",
-  "strapi": {
-    "name": "snowflake",
-    "description": "Description of strapi-auto-snowflake plugin",
-    "kind": "plugin"
-  },
-  "dependencies": {
-    "@strapi/design-system": "^1.6.3",
-    "@strapi/helper-plugin": "^4.6.0",
-    "@strapi/icons": "^1.6.3",
-    "prop-types": "^15.7.2"
-  },
-  "devDependencies": {
-    "@strapi/typescript-utils": "^4.6.0",
-    "@types/react": "^17.0.53",
-    "@types/react-dom": "^18.0.28",
-    "@types/react-router-dom": "^5.3.3",
-    "@types/styled-components": "^5.1.32",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^5.3.4",
-    "styled-components": "^5.3.6",
-    "typescript": "5.0.4",
-    "rimraf": "^3.0.2"
-  },
-  "peerDependencies": {
-    "@strapi/strapi": "4.25.10",
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0",
-    "react-router-dom": "^5.2.0",
-    "styled-components": "^5.2.1"
-  },
+  "version": "2.0.0",
+  "description": "",
+  "keywords": ["strapi", "snowflake"],
+  "license": "MIT",
   "author": {
-    "name": "XanderD",
-    "url": "https://github.com/XanderD99"
-  },
-  "maintainers": [
+      "name": "XanderD",
+      "url": "https://github.com/XanderD99"
+    },
+    "maintainers": [
     {
       "name": "XanderD",
       "url": "https://github.com/XanderD99"
@@ -50,16 +21,64 @@
     "type": "git",
     "directory": "."
   },
-  "engines": {
-    "node": ">=18.0.0 <=20.x.x",
-    "npm": ">=6.0.0"
+  "type": "commonjs",
+  "exports": {
+    "./package.json": "./package.json",
+    "./strapi-admin": {
+      "types": "./dist/admin/src/index.d.ts",
+      "source": "./admin/src/index.ts",
+      "import": "./dist/admin/index.mjs",
+      "require": "./dist/admin/index.js",
+      "default": "./dist/admin/index.js"
+    },
+    "./strapi-server": {
+      "types": "./dist/server/src/index.d.ts",
+      "source": "./server/src/index.ts",
+      "import": "./dist/server/index.mjs",
+      "require": "./dist/server/index.js",
+      "default": "./dist/server/index.js"
+    }
   },
-  "publishConfig": {
-    "access": "public"
-  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "develop": "tsc -p tsconfig.server.json -w",
-    "build": "tsc -p tsconfig.server.json"
+    "build": "strapi-plugin build",
+    "test:ts:back": "run -T tsc -p server/tsconfig.json",
+    "test:ts:front": "run -T tsc -p admin/tsconfig.json",
+    "verify": "strapi-plugin verify",
+    "watch": "strapi-plugin watch",
+    "watch:link": "strapi-plugin watch:link"
   },
-  "license": "MIT"
+  "dependencies": {
+    "@strapi/design-system": "^2.0.0-rc.11",
+    "@strapi/icons": "^2.0.0-rc.11",
+    "react-intl": "^6.6.8"
+  },
+  "devDependencies": {
+    "@strapi/sdk-plugin": "^5.2.6",
+    "@strapi/strapi": "^5.0.0",
+    "@strapi/typescript-utils": "^5.0.0",
+    "@types/react": "^18.3.7",
+    "@types/react-dom": "^18.3.0",
+    "prettier": "^3.3.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
+    "styled-components": "^6.1.13",
+    "typescript": "^5.6.2"
+  },
+  "peerDependencies": {
+    "@strapi/sdk-plugin": "^5.2.6",
+    "@strapi/strapi": "^5.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
+    "styled-components": "^6.1.13"
+  },
+  "strapi": {
+    "name": "snowflake",
+    "description": "A plugin that allows users to use snowflake IDs",
+    "kind": "plugin"
+  }
 }

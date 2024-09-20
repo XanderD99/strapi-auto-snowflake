@@ -1,30 +1,25 @@
-import { prefixPluginTranslations } from '@strapi/helper-plugin';
-
-import pluginPkg from '../../package.json';
-import pluginId from '../../utils/pluginId';
-import getTrad from '../../utils/getTrad';
-import Initializer from './components/Initializer';
-import PluginIcon from './components/PluginIcon';
-
-const name = pluginPkg.strapi.name;
+import { getTranslation } from './utils/getTranslation';
+import { PLUGIN_ID } from './pluginId';
+import { Initializer } from './components/Initializer';
+import { PluginIcon } from './components/PluginIcon';
 
 export default {
   register(app: any) {
     app.customFields.register({
       name: 'snowflake',
-      pluginId,
-      type: "string",
+      pluginId: PLUGIN_ID,
+      type: "uid",
       intlLabel: {
-        id: getTrad("form.label"),
+        id: getTranslation("label"),
         defaultMessage: "snowflake",
       },
       intlDescription: {
-        id: getTrad("form.description"),
+        id: getTranslation("description"),
         defaultMessage: "Generates a unique snowflake",
       },
       icon: PluginIcon,
       components: {
-        Input: async () => import(/* webpackChunkName: "input-uuid-component" */ "./components/Input"),
+        Input: async () => import("./components/SnowflakeField"),
       },
       options: {
         advanced: [
@@ -54,27 +49,23 @@ export default {
     });
 
 
-    const plugin = {
-      id: pluginId,
+    app.registerPlugin({
+      id: PLUGIN_ID,
       initializer: Initializer,
       isReady: false,
-      name,
-    };
-
-    app.registerPlugin(plugin);
+      name: PLUGIN_ID,
+    });
   },
-
-  bootstrap(app: any) {},
 
   async registerTrads(app: any) {
     const { locales } = app;
 
-    const importedTrads = await Promise.all(
-      (locales as any[]).map((locale) => {
+    const importedTranslations = await Promise.all(
+      (locales as string[]).map((locale) => {
         return import(`./translations/${locale}.json`)
           .then(({ default: data }) => {
             return {
-              data: prefixPluginTranslations(data, pluginId),
+              data: getTranslation(data),
               locale,
             };
           })
@@ -87,6 +78,6 @@ export default {
       })
     );
 
-    return Promise.resolve(importedTrads);
+    return importedTranslations;
   },
 };
