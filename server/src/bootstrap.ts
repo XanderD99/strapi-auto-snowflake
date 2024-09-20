@@ -1,8 +1,6 @@
-import { Strapi } from '@strapi/strapi';
-import { errors } from '@strapi/utils';
-import pluginId from '../utils/pluginId';
+import { Core } from '@strapi/strapi';
 
-export default ({ strapi }: { strapi: Strapi }) => {
+export default ({ strapi }: { strapi: Core.Strapi }) => {
   const { contentTypes } = strapi
   const models = Object.keys(contentTypes).reduce((acc, key) => {
     const contentType = contentTypes[key]
@@ -10,7 +8,7 @@ export default ({ strapi }: { strapi: Strapi }) => {
 
     const attributes = Object.keys(contentType.attributes).filter((attrKey) => {
       const attribute = contentType.attributes[attrKey]
-      if(attribute.customField === `plugin::${pluginId}.snowflake`) {
+      if(attribute.customField === `plugin::snowflake.snowflake`) {
         return true
       }
     })
@@ -24,7 +22,7 @@ export default ({ strapi }: { strapi: Strapi }) => {
 
   const modelsToSubscribe = Object.keys(models)
 
-  const { service } = strapi.plugin(pluginId);
+  const { service } = strapi.plugin('snowflake');
   const { generate } = service('snowflake');
 
   strapi.db!.lifecycles.subscribe((event) => {

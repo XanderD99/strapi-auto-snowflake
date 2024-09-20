@@ -2,8 +2,7 @@
  * snowflake service
  */
 
-import { Strapi } from "@strapi/strapi";
-import pluginId from "../../utils/pluginId";
+import { Core } from "@strapi/strapi";
 import { DEFAULTS } from "..";
 
 const one = BigInt(1)
@@ -16,12 +15,12 @@ export const waitUntilNextTimestamp = (currentTimestamp: number) => {
   return nextTimestamp;
 };
 
-export default ({ strapi }: { strapi: Strapi }) => {
+export default ({ strapi }: { strapi: Core.Strapi }) => {
   let lastTimestamp = -1;
   let sequence = 0;
   const maxSequence = (1 << DEFAULTS.SEQUENCE_BITS) - 1;
 
-  const { config } = strapi.plugin(pluginId);
+  const { config } = strapi.plugin('snowflake');
 
   const epoch: number = (config('epoch') as Date).getTime();
   const worker: number = config('worker')
