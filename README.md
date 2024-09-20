@@ -2,6 +2,8 @@
 
 This plugin provides automatic generation and validation of Snowflake IDs in Strapi, based on a custom epoch. It includes a custom field where Snowflake IDs can be viewed but not modified, and it automatically generates a Snowflake if none is present during creation.
 
+Plugin supports strapi v5 in from v2.0.0. If you are still on v4 use v1.0.0.
+
 > [!IMPORTANT]
 > If you want to integrate other services their snowflakes you can. It won't error, BUT do mind that the parse function could return incorrect information then.
 
